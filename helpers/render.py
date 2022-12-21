@@ -178,6 +178,11 @@ def render_animation(args, anim_args, animation_prompts, root):
             turbo_next_image, turbo_next_frame_idx = sample_to_cv2(prev_sample, type=np.float32), last_frame
             turbo_prev_image, turbo_prev_frame_idx = turbo_next_image, turbo_next_frame_idx
             start_frame = last_frame+turbo_steps
+        if args.use_mask and args.overlay_mask:
+            args.init_sample_raw = prev_sample
+        if anim_args.use_mask_video:
+            mask_frame = os.path.join(args.outdir, 'maskframes', f"{last_frame:05}.jpg")
+            args.mask_file = mask_frame
 
     args.n_samples = 1
     frame_idx = start_frame
