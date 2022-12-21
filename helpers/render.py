@@ -180,9 +180,11 @@ def render_animation(args, anim_args, animation_prompts, root):
             start_frame = last_frame+turbo_steps
         if args.use_mask and args.overlay_mask:
             args.init_sample_raw = prev_sample
+            print(path)
         if anim_args.use_mask_video:
-            mask_frame = os.path.join(args.outdir, 'maskframes', f"{last_frame:05}.jpg")
+            mask_frame = os.path.join(args.outdir, 'maskframes', f"{last_frame+1:05}.jpg")
             args.mask_file = mask_frame
+            print(mask_frame)
 
     args.n_samples = 1
     frame_idx = start_frame
