@@ -50,6 +50,8 @@ def generate(args, root, frame = 0, return_latent=False, return_sample=False, re
         init_image, mask_image = load_img(args.init_image, 
                                           shape=(args.W, args.H),  
                                           use_alpha_as_mask=args.use_alpha_as_mask)
+        print(f"mask_image is {mask_image}")
+        print(f"use_alpha_as_mask is {args.use_alpha_as_mask}")
         init_image = init_image.to(root.device)
         init_image = repeat(init_image, '1 ... -> b ...', b=batch_size)
         with precision_scope("cuda"):
@@ -66,7 +68,7 @@ def generate(args, root, frame = 0, return_latent=False, return_sample=False, re
         assert args.use_init, "use_mask==True: use_init is required for a mask"
         assert init_latent is not None, "use_mask==True: An latent init image is required for a mask"
 
-
+        print(f"args.mask_file is {args.mask_file}")
         mask = prepare_mask(args.mask_file if mask_image is None else mask_image, 
                             init_latent.shape, 
                             args.mask_contrast_adjust, 
@@ -257,13 +259,16 @@ def generate(args, root, frame = 0, return_latent=False, return_sample=False, re
                         # Overlay the masked image after the image is generated
                         if args.init_sample_raw is not None:
                             img_original = args.init_sample_raw
+                            print(f"args.init_sample_raw is: {args.init_sample_raw}")
                         elif init_image is not None:
                             img_original = init_image
+                            print("Using init_image as expected")
                         else:
                             raise Exception("Cannot overlay the masked image without an init image to overlay")
 
                         if args.mask_sample is None:
                             args.mask_sample = prepare_overlay_mask(args, root, img_original.shape)
+                            print("Making args.mask_sample since it is NONE")
 
                         x_samples = img_original * args.mask_sample + x_samples * ((args.mask_sample * -1.0) + 1)
 
