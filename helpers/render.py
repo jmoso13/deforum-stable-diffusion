@@ -166,24 +166,24 @@ def render_animation(args, anim_args, animation_prompts, root):
     color_match_sample = None
     if anim_args.resume_from_timestring:
         last_frame = start_frame-1
-        if turbo_steps > 1:
-            last_frame -= last_frame%turbo_steps
-        path = os.path.join(args.outdir,f"{args.timestring}_{last_frame:05}.png")
-        img = cv2.imread(path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        prev_sample = sample_from_cv2(img)
-        if anim_args.color_coherence != 'None':
-            color_match_sample = img
-        if turbo_steps > 1:
-            turbo_next_image, turbo_next_frame_idx = sample_to_cv2(prev_sample, type=np.float32), last_frame
-            turbo_prev_image, turbo_prev_frame_idx = turbo_next_image, turbo_next_frame_idx
-            start_frame = last_frame+turbo_steps
+        if not using_vid_init:
+            if turbo_steps > 1:
+                last_frame -= last_frame%turbo_steps
+            path = os.path.join(args.outdir,f"{args.timestring}_{last_frame:05}.png")
+            img = cv2.imread(path)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            prev_sample = sample_from_cv2(img)
+            if anim_args.color_coherence != 'None':
+                color_match_sample = img
+            if turbo_steps > 1:
+                turbo_next_image, turbo_next_frame_idx = sample_to_cv2(prev_sample, type=np.float32), last_frame
+                turbo_prev_image, turbo_prev_frame_idx = turbo_next_image, turbo_next_frame_idx
+                start_frame = last_frame+turbo_steps
 
     args.n_samples = 1
     frame_idx = start_frame
     while frame_idx < anim_args.max_frames:
         print(f"Rendering animation frame {frame_idx} of {anim_args.max_frames}")
-        print(prev_sample)
         noise = keys.noise_schedule_series[frame_idx]
         strength = keys.strength_schedule_series[frame_idx]
         contrast = keys.contrast_schedule_series[frame_idx]
